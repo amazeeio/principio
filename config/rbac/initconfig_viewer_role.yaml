@@ -1,0 +1,20 @@
+# permissions to do viewer initconfigs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: initconfig-viewer-role
+rules:
+- apiGroups:
+  - init.amazee.io
+  resources:
+  - initconfigs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - init.amazee.io
+  resources:
+  - initconfigs/status
+  verbs:
+  - get

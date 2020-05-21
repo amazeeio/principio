@@ -1,0 +1,26 @@
+# permissions to do edit initconfigs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: initconfig-editor-role
+rules:
+- apiGroups:
+  - init.amazee.io
+  resources:
+  - initconfigs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - init.amazee.io
+  resources:
+  - initconfigs/status
+  verbs:
+  - get
+  - patch
+  - update

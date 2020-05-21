@@ -1,0 +1,45 @@
+kind: InitConfig
+apiVersion: init.amazee.io/v1alpha1
+metadata:
+  name: my-custom-service
+  namespace: principio-controller
+spec:
+  initLabels:
+    - key: principio.amazee.io/no-custom-service
+      operator: DoesNotExist
+  initItems:
+    - apiVersion: v1
+      kind: Service
+      metadata:
+        name: custom-service
+      spec:
+        clusterIP: None
+        ports:
+          - port: 1
+            protocol: TCP
+            targetPort: 1
+        type: ClusterIP
+    - apiVersion: v1
+      kind: Endpoints
+      metadata:
+        name: custom-service
+      subsets:
+        - addresses:
+            - ip: 10.1.2.3
+            - ip: 10.1.2.4
+            - ip: 10.1.2.5
+          ports:
+            - port: 1
+              protocol: TCP
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: my-custom-namespace
+  labels:
+    principio.amazee.io/no-custom-service: 'true'
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: my-other-custom-namespace

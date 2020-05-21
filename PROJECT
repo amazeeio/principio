@@ -1,0 +1,7 @@
+domain: amazee.io
+repo: github.com/amazeeio/principio
+resources:
+- group: init
+  kind: InitConfig
+  version: v1alpha1
+version: "2"
