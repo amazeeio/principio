@@ -8,8 +8,8 @@ It will apply the items in `spec.initItems` to the namespace if the labels in `s
 
 Set your kube context to the cluster you want to install on, then run the following
 ```
-make IMG=amazeeio/principio:v0.0.1 deploy
 make install
+make IMG=amazeeio/principio:v0.0.1 deploy
 ```
 This will create `principio-system` namespace in the cluster and set up the controller.
 
