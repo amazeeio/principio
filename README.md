@@ -1,6 +1,6 @@
 # Principio
 
-When a namespace is created, it will serch the cluster for `InitConfig` kinds within the cluster.
+When a namespace is created, it will search the cluster for `InitConfig` kinds within the cluster.
 
 It will apply the items in `spec.initItems` to the namespace if the labels in `spec.initLabels` match or not.
 
