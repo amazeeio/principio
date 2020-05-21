@@ -57,6 +57,7 @@ func main() {
 		Scheme:             scheme,
 		MetricsBindAddress: metricsAddr,
 		LeaderElection:     enableLeaderElection,
+		LeaderElectionID:   "principio-leader-election-helper",
 		Port:               9443,
 	})
 	if err != nil {
