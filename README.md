@@ -24,7 +24,7 @@ kind: InitConfig
 apiVersion: init.amazee.io/v1alpha1
 metadata:
   name: my-custom-service
-  namespace: principio-controller
+  namespace: principio-system
 spec:
   initLabels:
     - key: principio.amazee.io/no-custom-service
