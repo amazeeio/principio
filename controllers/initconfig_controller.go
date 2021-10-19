@@ -122,7 +122,6 @@ func ignoreNotFound(err error) error {
 // check the "operator" logic
 // @TODO: this could/should? be replaced with something better
 func operatorCheck(trueCount *int, ruleCount *int, label metav1.LabelSelectorRequirement, labels map[string]string) {
-	fmt.Println(label.Key)
 	*ruleCount++
 	if label.Operator == metav1.LabelSelectorOpDoesNotExist {
 		if _, ok := labels[label.Key]; !ok {
