@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -62,12 +63,18 @@ func (r *InitConfigReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 	for _, config := range initConfigs.Items {
 		// always run config unless we have something in the labels that says otherwise
 		// @TODO: probably this section needs redoing
-		runConfig := true
+		runConfig := false
+		var ruleCount int
+		var trueCount int
 		// for all the labels in our config "selector" :D check if the operator matches
-		for _, label := range config.Spec.InitLabels {
-			operatorCheck(&runConfig, label["operator"], namespace.ObjectMeta.Labels, label["key"])
+		// for _, labelExpr := range config.Spec.InitLabels {
+		for _, label := range config.Spec.InitLabels.MatchExpressions {
+			operatorCheck(&trueCount, &ruleCount, label, namespace.ObjectMeta.Labels)
+			// }
 		} // @TODO: probably this section needs redoing
-
+		if trueCount == ruleCount {
+			runConfig = true
+		}
 		// if we get the go ahead, run the config
 		if runConfig {
 			// go through our items and create the objects
@@ -114,15 +121,45 @@ func ignoreNotFound(err error) error {
 
 // check the "operator" logic
 // @TODO: this could/should? be replaced with something better
-func operatorCheck(runConfig *bool, operator string, labels map[string]string, key string) {
-	if operator == "DoesNotExist" {
-		if _, ok := labels[key]; ok {
-			*runConfig = false
+func operatorCheck(trueCount *int, ruleCount *int, label metav1.LabelSelectorRequirement, labels map[string]string) {
+	fmt.Println(label.Key)
+	*ruleCount++
+	if label.Operator == metav1.LabelSelectorOpDoesNotExist {
+		if _, ok := labels[label.Key]; !ok {
+			*trueCount++
 		}
 	}
-	if operator == "Exists" {
-		if _, ok := labels[key]; ok {
-			*runConfig = true
+	if label.Operator == metav1.LabelSelectorOpExists {
+		if _, ok := labels[label.Key]; ok {
+			*trueCount++
 		}
 	}
+	if label.Operator == metav1.LabelSelectorOpIn {
+		if value, ok := labels[label.Key]; ok {
+			values := label.Values
+			for _, v := range values {
+				if v == value {
+					*trueCount++
+				}
+			}
+		}
+	}
+	if label.Operator == metav1.LabelSelectorOpNotIn {
+		// fmt.Println(labels[label.Key])
+		if value, ok := labels[label.Key]; ok {
+			values := label.Values
+			if !contains(values, value) {
+				*trueCount++
+			}
+		}
+	}
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
