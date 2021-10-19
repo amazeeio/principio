@@ -27,8 +27,9 @@ metadata:
   namespace: principio-system
 spec:
   initLabels:
-    - key: principio.amazee.io/no-custom-service
-      operator: DoesNotExist
+    matchExpressions:
+      - key: principio.amazee.io/no-custom-service
+        operator: DoesNotExist
   initItems:
     - apiVersion: v1
       kind: Service

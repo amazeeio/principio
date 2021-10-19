@@ -28,7 +28,7 @@ type InitConfigSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	InitLabels []map[string]string         `json:"initLabels,omitempty"`
+	InitLabels metav1.LabelSelector        `json:"initLabels,omitempty"`
 	InitItems  []unstructured.Unstructured `json:"initItems,omitempty"`
 }
 
