@@ -21,6 +21,8 @@ import (
 
 	"github.com/go-logr/logr"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/conversion"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -44,8 +46,7 @@ type InitConfigReconciler struct {
 // all the things
 // +kubebuilder:rbac:groups=*,resources=*,verbs=*
 
-func (r *InitConfigReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	ctx := context.Background()
+func (r *InitConfigReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	opLog := r.Log.WithValues("initconfig", req.NamespacedName)
 
 	var namespace corev1.Namespace
@@ -101,6 +102,21 @@ func (r *InitConfigReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		}
 	}
 	return ctrl.Result{}, nil
+}
+
+func ConvertRawExtensionToUnstructured(rawExtension *runtime.RawExtension) (*unstructured.Unstructured, error) {
+	var obj runtime.Object
+	var scope conversion.Scope
+	if err := runtime.Convert_runtime_RawExtension_To_runtime_Object(rawExtension, &obj, scope); err != nil {
+		return nil, err
+	}
+
+	innerObj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
+	if err != nil {
+		return nil, err
+	}
+
+	return &unstructured.Unstructured{Object: innerObj}, nil
 }
 
 // SetupWithManager sets up the watch on the namespace resource with an event filter (see controller_predicates.go)
